@@ -1,10 +1,10 @@
-set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_SYSTEM_VERSION 1)
-set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+# No executable file is generated to verify, it needs to be added when cross-compiling.
+# https://stackoverflow.com/questions/53633705/cmake-the-c-compiler-is-not-able-to-compile-a-simple-test-program
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 cmake_minimum_required(VERSION 3.20)
 
 # Toolchain location
-set(TOOLPATH  ~/Workspace/Embedded/wch/Toolchains/MRS_Toolchain_Linux_x64_V1.60/RISC-V Embedded GCC/bin)
+set(TOOLPATH  /home/jack/Workspace/Embedded/wch/Toolchains/RISC-V-Toolchains/bin)
 set(TOOLCHAIN ${TOOLPATH}/riscv-none-embed-)
 
 if (WIN32)
@@ -29,24 +29,24 @@ else ()
     MESSAGE(STATUS "Unsupported system!")
 endif ()
 
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+# Project name and language
+project(ch58x-Template C CXX ASM)
 
-# 项目设置
-project(ch582-ninja C CXX ASM)
+# Set the compiler standard
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD 99)
 
-# 编译参数 一般不用改
+# Set the compiler flags
 add_compile_options(-march=rv32imac -mabi=ilp32 -mcmodel=medany -msmall-data-limit=8 -mno-save-restore -std=gnu99)
 add_compile_options(-fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common)
 
-# 编译等级
+# Set compile optimization level (Level 3, maximum optimization)
 add_compile_options(-O3)
 
-# 编译信息等级
+# Set compile warning level (Generate all warnings)
 add_compile_options(-Wall)
 
-# 头文件路径
+# Include directories
 include_directories(BLE_LIB 
                     USB_LIB
                     RVMSIS  
@@ -55,10 +55,11 @@ include_directories(BLE_LIB
                     APP/inc
                     HAL/include)
 
-# 宏定义
+# add Definition DEBUG = 1, for files which have "#ifdef DEBUG"
+# such as StdPeriphDriver/inc/CH58x_common.h to use printf
 add_definitions(-DDEBUG=1)
 
-# 源码文件
+# Source files
 file(GLOB_RECURSE SOURCES 
                 "Startup/*.S" 
                 "USB_LIB/*.c"
@@ -68,7 +69,7 @@ file(GLOB_RECURSE SOURCES
                 "APP/*.c"
                 "HAL/*.c")
 
-# 链接参数
+# Link options
 set(LINKER_SCRIPT  ${CMAKE_SOURCE_DIR}/Ld/Link.ld)
 add_link_options(-nostartfiles 
                 -Xlinker --gc-sections  
@@ -78,16 +79,16 @@ add_link_options(-nostartfiles
                 --specs=nosys.specs)
 add_link_options(-T ${LINKER_SCRIPT})
 
-# 编译可执行文件
+# Compile executable file
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
 
-# 链接静态库
+# Link the static libraries
 target_link_libraries(${PROJECT_NAME}.elf 
         ${CMAKE_SOURCE_DIR}/StdPeriphDriver/libISP583.a 
         ${CMAKE_SOURCE_DIR}/BLE_LIB/LIBCH58xBLE.a 
         ${CMAKE_SOURCE_DIR}/USB_LIB/libRV3UFI.a)
 
-# 输出hex和bin
+# Generate binary and hex files
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
