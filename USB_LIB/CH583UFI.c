@@ -236,6 +236,7 @@ UINT8 CHRV3DiskConnect(void)
         //		return( ERR_USB_DISCON );
         goto mDiskDisconn;
     }
+    return 0;
 }
 #endif // NO_DEFAULT_DISK_CONNECT
 
