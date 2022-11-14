@@ -46,6 +46,10 @@ add_compile_options(-O3)
 # Set compile warning level (Generate all warnings)
 add_compile_options(-Wall)
 
+# add Definition DEBUG = 1, for files which have "#ifdef DEBUG"
+# such as StdPeriphDriver/inc/CH58x_common.h to use printf
+add_definitions(-DDEBUG=1)
+
 # Include directories
 include_directories(BLE_LIB 
                     USB_LIB
@@ -54,10 +58,6 @@ include_directories(BLE_LIB
                     printf
                     APP/inc
                     HAL/include)
-
-# add Definition DEBUG = 1, for files which have "#ifdef DEBUG"
-# such as StdPeriphDriver/inc/CH58x_common.h to use printf
-add_definitions(-DDEBUG=1)
 
 # Source files
 file(GLOB_RECURSE SOURCES 
@@ -68,6 +68,18 @@ file(GLOB_RECURSE SOURCES
                 "printf/printf.c"
                 "APP/*.c"
                 "HAL/*.c")
+
+
+# FreeRTOS supoort
+include_directories(FreeRTOS/include
+        FreeRTOS/portable/GCC/RISC-V
+        FreeRTOS/portable)
+
+file(GLOB_RECURSE SOURCES
+        "FreeRTOS/*.c"
+        "FreeRTOS/portable/GCC/RISC-V/*.c"
+        "FreeRTOS/portable/MemMang/heap_4.c")
+
 
 # Link options
 set(LINKER_SCRIPT  ${CMAKE_SOURCE_DIR}/Ld/Link.ld)
