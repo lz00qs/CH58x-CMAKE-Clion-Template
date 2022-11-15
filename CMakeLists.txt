@@ -4,11 +4,11 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 cmake_minimum_required(VERSION 3.20)
 
 # Toolchain location
-set(TOOLPATH  /home/jack/Workspace/Embedded/wch/Toolchains/RISC-V-Toolchains/bin)
+set(TOOLPATH /home/jack/Workspace/Embedded/wch/Toolchains/RISC-V-Toolchains/bin)
 set(TOOLCHAIN ${TOOLPATH}/riscv-none-embed-)
 
 if (WIN32)
-	MESSAGE(STATUS "Now is windows!")
+    MESSAGE(STATUS "Now is windows!")
     set(CMAKE_C_COMPILER ${TOOLCHAIN}gcc.exe)
     set(CMAKE_CXX_COMPILER ${TOOLCHAIN}g++.exe)
     set(CMAKE_ASM_COMPILER ${TOOLCHAIN}gcc.exe)
@@ -17,7 +17,7 @@ if (WIN32)
     set(CMAKE_OBJDUMP ${TOOLCHAIN}objdump.exe)
     set(SIZE ${TOOLCHAIN}size.exe)
 elseif (UNIX)
-	MESSAGE(STATUS "Now is UNIX-like OS!")
+    MESSAGE(STATUS "Now is UNIX-like OS!")
     set(CMAKE_C_COMPILER ${TOOLCHAIN}gcc)
     set(CMAKE_CXX_COMPILER ${TOOLCHAIN}g++)
     set(CMAKE_ASM_COMPILER ${TOOLCHAIN}gcc)
@@ -46,46 +46,58 @@ add_compile_options(-O3)
 # Set compile warning level (Generate all warnings)
 add_compile_options(-Wall)
 
-# Include directories
-include_directories(BLE_LIB 
-                    USB_LIB
-                    RVMSIS  
-                    StdPeriphDriver/inc
-                    printf
-                    APP/inc
-                    HAL/include)
-
 # add Definition DEBUG = 1, for files which have "#ifdef DEBUG"
 # such as StdPeriphDriver/inc/CH58x_common.h to use printf
 add_definitions(-DDEBUG=1)
 
+# Include directories
+include_directories(BLE_LIB
+        USB_LIB
+        RVMSIS
+        StdPeriphDriver/inc
+        printf
+        APP/inc
+        HAL/include)
+
 # Source files
-file(GLOB_RECURSE SOURCES 
-                "Startup/*.S" 
-                "USB_LIB/*.c"
-                "RVMSIS/*.c"
-                "StdPeriphDriver/*.c" 
-                "printf/printf.c"
-                "APP/*.c"
-                "HAL/*.c")
+file(GLOB_RECURSE SOURCES
+        "Startup/*.S"
+        "USB_LIB/*.c"
+        "RVMSIS/*.c"
+        "StdPeriphDriver/*.c"
+        "printf/printf.c"
+        "APP/*.c"
+        "HAL/*.c")
+
+
+# FreeRTOS supoort
+include_directories(FreeRTOS/include
+        FreeRTOS/portable/GCC/RISC-V
+        FreeRTOS/portable)
+
+file(GLOB_RECURSE SOURCES
+        "FreeRTOS/*.c"
+        "FreeRTOS/portable/GCC/RISC-V/*.c"
+        "FreeRTOS/portable/MemMang/heap_4.c")
+
 
 # Link options
-set(LINKER_SCRIPT  ${CMAKE_SOURCE_DIR}/Ld/Link.ld)
-add_link_options(-nostartfiles 
-                -Xlinker --gc-sections  
-                -Wl,--print-memory-usage
-                -Wl,-Map,${PROJECT_NAME}.map 
-                --specs=nano.specs 
-                --specs=nosys.specs)
+set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/Ld/Link.ld)
+add_link_options(-nostartfiles
+        -Xlinker --gc-sections
+        -Wl,--print-memory-usage
+        -Wl,-Map,${PROJECT_NAME}.map
+        --specs=nano.specs
+        --specs=nosys.specs)
 add_link_options(-T ${LINKER_SCRIPT})
 
 # Compile executable file
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
 
 # Link the static libraries
-target_link_libraries(${PROJECT_NAME}.elf 
-        ${CMAKE_SOURCE_DIR}/StdPeriphDriver/libISP583.a 
-        ${CMAKE_SOURCE_DIR}/BLE_LIB/LIBCH58xBLE.a 
+target_link_libraries(${PROJECT_NAME}.elf
+        ${CMAKE_SOURCE_DIR}/StdPeriphDriver/libISP583.a
+        ${CMAKE_SOURCE_DIR}/BLE_LIB/LIBCH58xBLE.a
         ${CMAKE_SOURCE_DIR}/USB_LIB/libRV3UFI.a)
 
 # Generate binary and hex files
@@ -94,4 +106,4 @@ set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${HEX_FILE}
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
-)
+        )
