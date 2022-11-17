@@ -57,7 +57,14 @@ include_directories(BLE_LIB
         StdPeriphDriver/inc
         printf
         APP/inc
-        HAL/include)
+        HAL/include
+        ## FreeRTOS support
+#        FreeRTOS/include
+#        FreeRTOS/portable/GCC/RISC-V
+#        FreeRTOS/portable
+        # GATT support
+        Profile/include
+        )
 
 # Source files
 file(GLOB_RECURSE SOURCES
@@ -67,19 +74,14 @@ file(GLOB_RECURSE SOURCES
         "StdPeriphDriver/*.c"
         "printf/printf.c"
         "APP/*.c"
-        "HAL/*.c")
-
-
-# FreeRTOS supoort
-include_directories(FreeRTOS/include
-        FreeRTOS/portable/GCC/RISC-V
-        FreeRTOS/portable)
-
-file(GLOB_RECURSE SOURCES
-        "FreeRTOS/*.c"
-        "FreeRTOS/portable/GCC/RISC-V/*.c"
-        "FreeRTOS/portable/MemMang/heap_4.c")
-
+        "HAL/*.c"
+        ## FreeRTOS support
+#        "FreeRTOS/*.c"
+#        "FreeRTOS/portable/GCC/RISC-V/*.c"
+#        "FreeRTOS/portable/MemMang/heap_4.c"
+        # GATT support
+        "Profile/*.c"
+        )
 
 # Link options
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/Ld/Link.ld)
