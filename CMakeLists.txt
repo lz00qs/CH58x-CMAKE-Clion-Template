@@ -4,7 +4,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 cmake_minimum_required(VERSION 3.20)
 
 # Toolchain location
-set(TOOLPATH /home/jack/Workspace/Embedded/wch/Toolchains/RISC-V-Toolchains/bin)
+set(TOOLPATH /home/jack/Workspace/Embedded/WCH/MRS_Toolchain_Linux_x64_V1.60/RISC-V_Embedded_GCC/bin)
 set(TOOLCHAIN ${TOOLPATH}/riscv-none-embed-)
 
 if (WIN32)
