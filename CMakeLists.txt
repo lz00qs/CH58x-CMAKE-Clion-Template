@@ -1,10 +1,10 @@
 # No executable file is generated to verify, it needs to be added when cross-compiling.
 # https://stackoverflow.com/questions/53633705/cmake-the-c-compiler-is-not-able-to-compile-a-simple-test-program
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 cmake_minimum_required(VERSION 3.20)
 
 # Toolchain location
-set(TOOLPATH /home/jack/Workspace/Embedded/wch/Toolchains/RISC-V-Toolchains/bin)
+set(TOOLPATH /Users/Shared/MRS_Toolchain_MAC_V191/xpack-riscv-none-embed-gcc-8.2.0/bin)
 set(TOOLCHAIN ${TOOLPATH}/riscv-none-embed-)
 
 if (WIN32)
@@ -18,6 +18,7 @@ if (WIN32)
     set(SIZE ${TOOLCHAIN}size.exe)
 elseif (UNIX)
     MESSAGE(STATUS "Now is UNIX-like OS!")
+    set(CMAKE_SYSTEM_NAME Linux)
     set(CMAKE_C_COMPILER ${TOOLCHAIN}gcc)
     set(CMAKE_CXX_COMPILER ${TOOLCHAIN}g++)
     set(CMAKE_ASM_COMPILER ${TOOLCHAIN}gcc)
